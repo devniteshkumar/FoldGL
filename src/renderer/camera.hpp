@@ -10,6 +10,7 @@ public:
 
     glm::mat4 GetViewMatrix() const;
     void ProcessKeyboard(char direction, float deltaTime);
+    void ProcessMouseMovement(float xoffset, float yoffset, bool constrainPitch = true);
     glm::vec3 GetPosition() const { return Position; }
 
 private:
@@ -23,4 +24,5 @@ private:
     float Yaw;
     float Pitch;
     float MovementSpeed = 2.5f;
+    float MouseSensitivity = 0.1f;
 };

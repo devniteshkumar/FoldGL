@@ -10,6 +10,38 @@
 #include <iostream>
 #include "utils/fileio.hpp"
 
+// Mouse state
+float lastX = 400.0f;
+float lastY = 300.0f;
+bool firstMouse = true;
+Camera* g_camera = nullptr;
+void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+{
+    if (firstMouse)
+    {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos; // reversed: y ranges bottom to top
+    lastX = xpos;
+    lastY = ypos;
+    if (g_camera)
+        g_camera->ProcessMouseMovement(xoffset, yoffset);
+}
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include "renderer/shader.hpp"
+#include "renderer/mesh.hpp"
+#include "renderer/camera.hpp"
+#include <vector>
+#include <iostream>
+#include "utils/fileio.hpp"
+
 void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 {
     glViewport(0, 0, width, height);
@@ -65,6 +97,9 @@ int main()
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
+    // Set mouse callback
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
         std::cerr << "Failed to initialize GLAD" << std::endl;
@@ -100,6 +135,8 @@ int main()
     glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
     Camera camera;
+    g_camera = &camera;
+    glfwSetCursorPosCallback(window, mouse_callback);
     float lastFrame = 0.0f;
 
     while (!glfwWindowShouldClose(window))
