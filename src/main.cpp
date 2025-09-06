@@ -30,17 +30,6 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
     if (g_camera)
         g_camera->ProcessMouseMovement(xoffset, yoffset);
 }
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include "renderer/shader.hpp"
-#include "renderer/mesh.hpp"
-#include "renderer/camera.hpp"
-#include <vector>
-#include <iostream>
-#include "utils/fileio.hpp"
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 {
