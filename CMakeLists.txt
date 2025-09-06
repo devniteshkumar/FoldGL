@@ -26,6 +26,7 @@ set(SOURCES
     src/renderer/texture.cpp
     src/utils/fileio.cpp
     src/renderer/mesh.cpp
+    src/renderer/camera.cpp
 )
 
 add_executable(ogt ${SOURCES})

@@ -5,6 +5,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "renderer/shader.hpp"
 #include "renderer/mesh.hpp"
+#include "renderer/camera.hpp"
 #include <vector>
 #include <iostream>
 #include "utils/fileio.hpp"
@@ -12,6 +13,39 @@
 void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 {
     glViewport(0, 0, width, height);
+}
+
+void processInput(GLFWwindow *window, Camera &camera, float deltaTime)
+{
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        camera.ProcessKeyboard('W', deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        camera.ProcessKeyboard('S', deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        camera.ProcessKeyboard('A', deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        camera.ProcessKeyboard('D', deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+        camera.ProcessKeyboard('Q', deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+        camera.ProcessKeyboard('E', deltaTime);
+}
+
+void setShaderUniforms(Shader &shader, Camera &camera, glm::vec3 lightPos)
+{
+    glm::mat4 model = glm::rotate(glm::mat4(1.0f), (float)glfwGetTime(), glm::vec3(0.5f, 1.0f, 0.0f));
+    glm::mat4 view = camera.GetViewMatrix();
+    glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+
+    shader.setMat4("model", model);
+    shader.setMat4("view", view);
+    shader.setMat4("projection", projection);
+    shader.setVec3("lightPos", lightPos);
+    shader.setVec3("viewPos", camera.GetPosition());
+    shader.setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+    shader.setVec3("objectColor", glm::vec3(0.2f, 0.6f, 1.0f));
 }
 
 int main()
@@ -65,24 +99,23 @@ int main()
 
     glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
+    Camera camera;
+    float lastFrame = 0.0f;
+
     while (!glfwWindowShouldClose(window))
     {
+        float currentFrame = glfwGetTime();
+        float deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+
+        processInput(window, camera, deltaTime);
+
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         meshShader.autoreload();
         meshShader.use();
-        glm::mat4 model = glm::rotate(glm::mat4(1.0f), (float)glfwGetTime(), glm::vec3(0.5f, 1.0f, 0.0f));
-        glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f));
-        glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
-        meshShader.setMat4("model", model);
-        meshShader.setMat4("view", view);
-        meshShader.setMat4("projection", projection);
-        meshShader.setVec3("lightPos", lightPos);
-        meshShader.setVec3("viewPos", glm::vec3(0.0f, 0.0f, 3.0f));
-        meshShader.setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-        meshShader.setVec3("objectColor", glm::vec3(0.2f, 0.6f, 1.0f));
-
+        setShaderUniforms(meshShader, camera, lightPos);
         cube.Draw();
 
         glfwSwapBuffers(window);
