@@ -4,7 +4,7 @@
     {
       "label": "Build and Run OGT",
       "type": "shell",
-      "command": "cmake --build . && ./build/ogt",
+      "command": "cmake . && cmake --build . && ./build/ogt",
       "problemMatcher": [],
       "group": {
         "kind": "build",

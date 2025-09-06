@@ -25,6 +25,7 @@ set(SOURCES
     src/renderer/buffers.cpp
     src/renderer/texture.cpp
     src/utils/fileio.cpp
+    src/renderer/mesh.cpp
 )
 
 add_executable(ogt ${SOURCES})
@@ -38,27 +39,7 @@ target_include_directories(ogt PRIVATE
     src
 )
 
-set(IMGUI_DIR external/imgui)
-set(IMGUI_BACKEND_DIR ${IMGUI_DIR}/backends)
-
-add_library(imgui STATIC
-    ${IMGUI_DIR}/imgui.cpp
-    ${IMGUI_DIR}/imgui_draw.cpp
-    ${IMGUI_DIR}/imgui_widgets.cpp
-    ${IMGUI_DIR}/imgui_tables.cpp
-    ${IMGUI_DIR}/imgui_demo.cpp
-    ${IMGUI_BACKEND_DIR}/imgui_impl_glfw.cpp
-    ${IMGUI_BACKEND_DIR}/imgui_impl_opengl3.cpp
-)
-
-target_include_directories(imgui PUBLIC
-    ${IMGUI_DIR}
-    ${IMGUI_BACKEND_DIR}
-    external/glfw/include
-)
-
 target_link_libraries(ogt
     OpenGL::GL
     glfw
-    imgui
 )
