@@ -16,10 +16,10 @@
 <br />
 <div align="center">
 
-  <h3 align="center">Ripple Simulation</h3>
+  <h3 align="center">FoldGL</h3>
 
   <p align="center">
-    <i>A real-time water ripple simulation using OpenGL with an interactive GUI control panel</i>
+    <i>A high-performance 3D protein structure visualization tool built with OpenGL</i>
   </p>
 </div>
 
@@ -33,6 +33,8 @@
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
 - [Usage](#usage)
+- [Project Structure](#project-structure)
+- [TODO](#todo)
 - [Contact](#contact)
   - [Maintainer(s)](#maintainers)
   - [Creator(s)](#creators)
@@ -43,36 +45,34 @@
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
-<div align="center">
-  <a href="https://github.com/devniteshkumar/ripple-simulation">
-    <img width="80%" alt="ripple-simulation-demo" src="https://media.githubusercontent.com/media/devniteshkumar/ripple-simulation/master/assets/ReadmeGIF.gif">
-  </a>
-</div>
 
-Ripple Simulation is a real-time water ripple simulation built with OpenGL featuring advanced shader-based rendering and an interactive GUI control panel. The project demonstrates realistic physics-based water ripple effects with multiple simultaneous ripples and comprehensive parameter controls.
+FoldGL is a high-performance 3D protein structure visualization tool built with modern OpenGL. It provides comprehensive support for parsing and rendering Protein Data Bank (PDB) files with an intuitive camera system for interactive exploration of molecular structures.
 
 **Key Features:**
-- Real-time ripple effects with improved realism
-- Interactive water surface
-- **Multiple simultaneous ripples** (up to 10 ripples)
-- Shader-based rendering with enhanced physics
-- **Comprehensive GUI Control Panel** with adjustable parameters:
-  - Height Scale slider (0.0 - 0.1)
-  - Time Scale slider (0.1 - 2.0)
-  - Decay Scale slider (0.0 - 5.0)
-  - Number of ripples input (customizable limit)
-  - Frequency input (wave frequency control)
-  - Speed input (ripple propagation speed)
-  - **Reset Ripples button** (clear all active ripples)
-- Hot-reload shader support
-- Memory-safe implementation with Address Sanitizer support
+- **PDB File Parsing**: Complete support for standard PDB format files
+  - Atomic coordinates and properties
+  - Residue and chain information
+  - Secondary structure elements (helices, strands, coils)
+  - Multiple model support
+- **3D Visualization**: Real-time OpenGL rendering
+  - Modern shader-based rendering pipeline
+  - Smooth camera controls with mouse and keyboard
+  - 3D mesh rendering with proper lighting
+- **Molecular Structure Support**:
+  - Atom-level visualization
+  - Residue-based organization
+  - Chain and model hierarchy
+  - Secondary structure representation
+- **Development Features**:
+  - Hot-reload shader support for real-time development
+  - Memory-safe implementation with Address Sanitizer support
+  - Modular architecture with clean separation of concerns
 
 **Dependencies:**
 This project uses the following external libraries as git submodules:
-- **GLAD** - OpenGL loader library
-- **GLFW** - Window and input handling
-- **GLM** - OpenGL Mathematics library
-- **ImGui** - Immediate Mode GUI library
+- **GLAD** - OpenGL loader library for modern OpenGL functions
+- **GLFW** - Cross-platform window and input handling
+- **GLM** - OpenGL Mathematics library for vector/matrix operations
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -94,26 +94,30 @@ _Now that the environment has been set up and configured to properly compile and
 
 1. Clone the repository with submodules
    ```sh
-   git clone https://github.com/devniteshkumar/ripple-simulation.git --recurse-submodules
+   git clone <your-foldgl-repository-url> --recurse-submodules
    ```
-2. Update submodules if needed
+2. Navigate to the project directory
    ```sh
-   cd ripple-simulation
+   cd FoldGL
+   ```
+3. Update submodules if needed
+   ```sh
    git submodule update --init --recursive
    ```
-3. Build the project
+4. Configure the project with CMake
    ```sh
    cmake .
    ```
-4. Run the application
-    ```sh
+5. Build the project
+   ```sh
    cmake --build .
    ```
+6. Run the application
    ```sh
    ./build/ogt
    ```
 
-**Alternative:** If you are using VSCode, you can just run the build task (generally, `Ctrl + Shift + B`).
+**Alternative:** If you are using VSCode, you can use the CMake extension and run the build task (generally, `Ctrl + Shift + B`).
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -121,54 +125,177 @@ _Now that the environment has been set up and configured to properly compile and
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-The Ripple Simulation provides an interactive water surface where you can create and manipulate realistic ripple effects. Use the comprehensive GUI control panel to fine-tune the simulation parameters in real-time.
+FoldGL provides an interactive 3D environment for visualizing protein structures from PDB files. Use the intuitive camera controls to explore molecular structures in real-time with smooth navigation and lighting.
 
-**Controls:**
-- **Left Click**: Create ripples at cursor position (multiple ripples supported)
+**Camera Controls:**
+- **W/A/S/D**: Move camera forward/left/backward/right
+- **Q/E**: Move camera up/down
+- **Mouse Movement**: Look around (first-person camera)
 - **ESC**: Exit application
-- **GUI Controls**: Use the Control Panel window to adjust:
-  - **Height Scale**: Controls the amplitude of the ripple effect (0.0 - 0.1)
-  - **Time Scale**: Controls the speed of the ripple animation (0.1 - 2.0)
-  - **Decay Scale**: Controls how quickly ripples fade over time (0.0 - 5.0)
-  - **Number of ripples**: Set the maximum number of simultaneous ripples
-  - **Frequency**: Adjust the wave frequency for ripple density
-  - **Speed**: Control the propagation speed of ripples
-  - **Reset Ripples**: Clear all active ripples from the simulation
 
-**Project Structure:**
+**Getting Started:**
+1. Launch the application using `./build/ogt`
+2. The application will start with a simple 3D scene
+3. Use the camera controls to navigate around the 3D space
+4. *Note: PDB file loading functionality is currently in development*
+
+<p align="right">(<a href="#top">back to top</a>)</p>
+
+## Project Structure
+
 ```
 .
-├── assets
-│   ├── gradient.jpg
-│   └── water_texture.jpg
-├── build
-│   └── ogt
-├── external/
-│   ├── glad/
-│   ├── glfw/
-│   ├── glm/
-│   └── imgui/
-├── CMakeLists.txt
-└── src
-    ├── main.cpp
-    ├── renderer
-    │   ├── buffers.cpp
-    │   ├── buffers.hpp
-    │   ├── renderer.cpp
-    │   ├── renderer.hpp
-    │   ├── shader.cpp
-    │   ├── shader.hpp
-    │   ├── texture.cpp
-    │   └── texture.hpp
-    ├── shader
-    │   ├── ripple.frag
-    │   └── ripple.vert
-    └── utils
-        ├── fileio.cpp
-        ├── fileio.hpp
-        ├── FileWatch.hpp
-        └── stb_image.h
+├── build/                      # Build output directory
+│   └── ogt                     # Compiled executable
+├── external/                   # External dependencies (git submodules)
+│   ├── glad/                   # OpenGL loader library
+│   ├── glfw/                   # Window and input handling
+│   └── glm/                    # OpenGL Mathematics library
+├── CMakeLists.txt              # CMake build configuration
+└── src/                        # Source code
+    ├── main.cpp                # Application entry point
+    ├── pdb/                    # PDB file parsing and data structures
+    │   ├── common.hpp/cpp      # Common utilities and definitions
+    │   ├── atom.hpp/cpp        # Atomic data structure and parsing
+    │   ├── residue.hpp/cpp     # Amino acid residue representation
+    │   ├── chain.hpp/cpp       # Protein chain organization
+    │   ├── model.hpp/cpp       # PDB model container
+    │   ├── secondary_structure.hpp/cpp  # Helix/strand/coil structures
+    │   └── pdb.hpp             # Main PDB package header
+    ├── renderer/               # OpenGL rendering system
+    │   ├── shader.hpp/cpp      # Shader compilation and management
+    │   ├── mesh.hpp/cpp        # 3D mesh representation
+    │   ├── camera.hpp/cpp      # Camera system and controls
+    │   ├── buffers.hpp/cpp     # OpenGL buffer management
+    │   ├── texture.hpp/cpp     # Texture loading and handling
+    │   └── renderer.hpp/cpp    # Main rendering pipeline
+    ├── shader/                 # GLSL shader files
+    │   ├── mesh.vert           # Vertex shader for 3D meshes
+    │   └── mesh.frag           # Fragment shader for lighting
+    └── utils/                  # Utility functions
+        ├── fileio.hpp/cpp      # File I/O operations
+        ├── FileWatch.hpp       # Hot-reload file watching
+        └── stb_image.h         # Image loading library
 ```
+
+<p align="right">(<a href="#top">back to top</a>)</p>
+
+## TODO
+
+### Core Features
+- [ ] **PDB File Loading and Integration**
+  - [ ] Command-line argument support for PDB file input
+  - [ ] File dialog for interactive PDB file selection
+  - [ ] Integration of PDB parser with rendering system
+  - [ ] Error handling for malformed PDB files
+  - [ ] Support for compressed PDB files (.pdb.gz)
+
+- [ ] **Protein Visualization**
+  - [ ] Atom-based rendering (spheres/points)
+  - [ ] Bond visualization (cylinders/lines)
+  - [ ] Multiple representation modes:
+    - [ ] Ball-and-stick model
+    - [ ] Space-filling model
+    - [ ] Ribbon/cartoon representation
+    - [ ] Wireframe model
+  - [ ] Secondary structure highlighting
+    - [ ] Alpha helices (cylinders/ribbons)
+    - [ ] Beta strands (arrows/sheets)
+    - [ ] Loops and coils
+
+- [ ] **Interactive Features**
+  - [ ] Atom/residue selection and highlighting
+  - [ ] Information display for selected atoms/residues
+  - [ ] Distance and angle measurements
+  - [ ] Multiple protein loading and comparison
+  - [ ] Animation support for multi-model PDB files
+
+### User Interface
+- [ ] **GUI Development**
+  - [ ] Integrate ImGui for control panels
+  - [ ] File browser widget
+  - [ ] Visualization controls:
+    - [ ] Representation mode selection
+    - [ ] Color scheme options
+    - [ ] Visibility toggles for chains/residues
+    - [ ] Lighting and material properties
+  - [ ] Information panels:
+    - [ ] Protein metadata display
+    - [ ] Selection details
+    - [ ] Statistics and analysis
+
+- [ ] **Camera and Navigation**
+  - [ ] Improved camera system:
+    - [ ] Orbit/trackball navigation
+    - [ ] Zoom to selection
+    - [ ] Predefined viewpoints
+    - [ ] Smooth camera transitions
+  - [ ] View presets (front, back, top, etc.)
+  - [ ] Camera position saving/loading
+
+### Performance and Optimization
+- [ ] **Rendering Optimization**
+  - [ ] Level-of-detail (LOD) system for large proteins
+  - [ ] Instanced rendering for repeated elements
+  - [ ] Frustum culling for off-screen atoms
+  - [ ] GPU-based atom/bond generation
+  - [ ] Texture-based color schemes
+
+- [ ] **Memory Management**
+  - [ ] Efficient data structures for large proteins
+  - [ ] Streaming for extremely large datasets
+  - [ ] Memory pool allocation
+  - [ ] Garbage collection for unused resources
+
+### Advanced Features
+- [ ] **Analysis Tools**
+  - [ ] Ramachandran plot visualization
+  - [ ] Hydrogen bond detection and display
+  - [ ] Surface area calculations
+  - [ ] Cavity and pocket detection
+  - [ ] Molecular dynamics trajectory support
+
+- [ ] **Export and Sharing**
+  - [ ] High-resolution image export
+  - [ ] 3D model export (OBJ, STL)
+  - [ ] Animation export (video/GIF)
+  - [ ] Session save/load functionality
+  - [ ] Web-based sharing capabilities
+
+### Technical Improvements
+- [ ] **Code Quality**
+  - [ ] Comprehensive unit testing
+  - [ ] Automated integration tests
+  - [ ] Performance benchmarking
+  - [ ] Memory leak detection
+  - [ ] Code documentation with Doxygen
+
+- [ ] **Platform Support**
+  - [ ] Linux support optimization
+  - [ ] Windows compatibility
+  - [ ] macOS support
+  - [ ] Web Assembly port (experimental)
+
+- [ ] **Developer Experience**
+  - [ ] Plugin system architecture
+  - [ ] Python scripting interface
+  - [ ] Automated build system (CI/CD)
+  - [ ] Development documentation
+  - [ ] Contributing guidelines
+
+### Research and Education Features
+- [ ] **Educational Tools**
+  - [ ] Interactive tutorials
+  - [ ] Guided protein exploration
+  - [ ] Annotation system for teaching
+  - [ ] Quiz/assessment integration
+
+- [ ] **Research Integration**
+  - [ ] PDB database API integration
+  - [ ] UniProt data integration
+  - [ ] RCSB PDB metadata display
+  - [ ] Literature reference linking
+  - [ ] Experimental data visualization
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -191,20 +318,21 @@ Honoring the original creator(s) and ideator(s) of this project.
 ## Additional documentation
 
   - [License](/LICENSE)
-  - [DeepWiki Documentation](https://deepwiki.com/devniteshkumar/ripple-simulation)
+  - [FoldGL Documentation](https://github.com/your-username/FoldGL/wiki) (Coming Soon)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 <!-- MARKDOWN LINKS & IMAGES -->
+<!-- Note: Update these URLs to point to your actual FoldGL repository -->
 
-[contributors-shield]: https://img.shields.io/github/contributors/devniteshkumar/ripple-simulation.svg?style=for-the-badge
-[contributors-url]: https://github.com/devniteshkumar/ripple-simulation/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/devniteshkumar/ripple-simulation.svg?style=for-the-badge
-[forks-url]: https://github.com/devniteshkumar/ripple-simulation/network/members
-[stars-shield]: https://img.shields.io/github/stars/devniteshkumar/ripple-simulation.svg?style=for-the-badge
-[stars-url]: https://github.com/devniteshkumar/ripple-simulation/stargazers
-[issues-shield]: https://img.shields.io/github/issues/devniteshkumar/ripple-simulation.svg?style=for-the-badge
-[issues-url]: https://github.com/devniteshkumar/ripple-simulation/issues
-[license-shield]: https://img.shields.io/github/license/devniteshkumar/ripple-simulation.svg?style=for-the-badge
-[license-url]: https://github.com/devniteshkumar/ripple-simulation/blob/master/LICENSE
+[contributors-shield]: https://img.shields.io/github/contributors/your-username/FoldGL.svg?style=for-the-badge
+[contributors-url]: https://github.com/your-username/FoldGL/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/your-username/FoldGL.svg?style=for-the-badge
+[forks-url]: https://github.com/your-username/FoldGL/network/members
+[stars-shield]: https://img.shields.io/github/stars/your-username/FoldGL.svg?style=for-the-badge
+[stars-url]: https://github.com/your-username/FoldGL/stargazers
+[issues-shield]: https://img.shields.io/github/issues/your-username/FoldGL.svg?style=for-the-badge
+[issues-url]: https://github.com/your-username/FoldGL/issues
+[license-shield]: https://img.shields.io/github/license/your-username/FoldGL.svg?style=for-the-badge
+[license-url]: https://github.com/your-username/FoldGL/blob/main/LICENSE
 
