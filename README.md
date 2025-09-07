@@ -94,7 +94,7 @@ _Now that the environment has been set up and configured to properly compile and
 
 1. Clone the repository with submodules
    ```sh
-   git clone <your-foldgl-repository-url> --recurse-submodules
+   git clone https://github.com/devniteshkumar/FoldGL.git --recurse-submodules
    ```
 2. Navigate to the project directory
    ```sh
