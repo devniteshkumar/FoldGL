@@ -318,21 +318,21 @@ Honoring the original creator(s) and ideator(s) of this project.
 ## Additional documentation
 
   - [License](/LICENSE)
-  - [FoldGL Documentation](https://github.com/your-username/FoldGL/wiki) (Coming Soon)
+  - [FoldGL Documentation](https://github.com/devniteshkumar/FoldGL/wiki) (Coming Soon)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- Note: Update these URLs to point to your actual FoldGL repository -->
 
-[contributors-shield]: https://img.shields.io/github/contributors/your-username/FoldGL.svg?style=for-the-badge
-[contributors-url]: https://github.com/your-username/FoldGL/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/your-username/FoldGL.svg?style=for-the-badge
-[forks-url]: https://github.com/your-username/FoldGL/network/members
-[stars-shield]: https://img.shields.io/github/stars/your-username/FoldGL.svg?style=for-the-badge
-[stars-url]: https://github.com/your-username/FoldGL/stargazers
-[issues-shield]: https://img.shields.io/github/issues/your-username/FoldGL.svg?style=for-the-badge
-[issues-url]: https://github.com/your-username/FoldGL/issues
-[license-shield]: https://img.shields.io/github/license/your-username/FoldGL.svg?style=for-the-badge
-[license-url]: https://github.com/your-username/FoldGL/blob/main/LICENSE
+[contributors-shield]: https://img.shields.io/github/contributors/devniteshkumar/FoldGL.svg?style=for-the-badge
+[contributors-url]: https://github.com/devniteshkumar/FoldGL/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/devniteshkumar/FoldGL.svg?style=for-the-badge
+[forks-url]: https://github.com/devniteshkumar/FoldGL/network/members
+[stars-shield]: https://img.shields.io/github/stars/devniteshkumar/FoldGL.svg?style=for-the-badge
+[stars-url]: https://github.com/devniteshkumar/FoldGL/stargazers
+[issues-shield]: https://img.shields.io/github/issues/devniteshkumar/FoldGL.svg?style=for-the-badge
+[issues-url]: https://github.com/devniteshkumar/FoldGL/issues
+[license-shield]: https://img.shields.io/github/license/devniteshkumar/FoldGL.svg?style=for-the-badge
+[license-url]: https://github.com/devniteshkumar/FoldGL/blob/main/LICENSE
 
