@@ -6,6 +6,7 @@
 #include "renderer/shader.hpp"
 #include "renderer/mesh.hpp"
 #include "renderer/camera.hpp"
+#include "pdb/model.hpp"
 #include <vector>
 #include <iostream>
 #include "utils/fileio.hpp"
@@ -14,8 +15,8 @@
 float lastX = 400.0f;
 float lastY = 300.0f;
 bool firstMouse = true;
-Camera* g_camera = nullptr;
-void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+Camera *g_camera = nullptr;
+void mouse_callback(GLFWwindow *window, double xpos, double ypos)
 {
     if (firstMouse)
     {
@@ -29,6 +30,42 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
     lastY = ypos;
     if (g_camera)
         g_camera->ProcessMouseMovement(xoffset, yoffset);
+}
+
+// Model to Mesh
+Mesh modelToMesh(const pdb::Model &model)
+{
+    std::vector<Vertex> vertices;
+    std::vector<unsigned int> indices;
+    std::unordered_map<int, unsigned int> serialToIndex; // atom.serial -> vertex index
+
+    // 1. Atoms → vertices
+    for (const auto &atom : model.atoms)
+    {
+        Vertex v;
+        v.Position = glm::vec3(atom->x, atom->y, atom->z);
+
+        // Normal placeholder: if drawing as points/lines, normals don't matter
+        // If later you do spheres/surfaces, you’ll want real normals
+        v.Normal = glm::normalize(v.Position);
+
+        serialToIndex[atom->serial] = static_cast<unsigned int>(vertices.size());
+        vertices.push_back(v);
+    }
+
+    // 2. Connections → indices
+    for (const auto &conn : model.connections)
+    {
+        auto it1 = serialToIndex.find(conn->serial1);
+        auto it2 = serialToIndex.find(conn->serial2);
+
+        if (it1 != serialToIndex.end() && it2 != serialToIndex.end())
+        {
+            indices.push_back(it1->second);
+            indices.push_back(it2->second);
+        }
+    }
+    return Mesh(vertices, indices);
 }
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height)
@@ -56,7 +93,8 @@ void processInput(GLFWwindow *window, Camera &camera, float deltaTime)
 
 void setShaderUniforms(Shader &shader, Camera &camera, glm::vec3 lightPos)
 {
-    glm::mat4 model = glm::rotate(glm::mat4(1.0f), (float)glfwGetTime(), glm::vec3(0.5f, 1.0f, 0.0f));
+    // glm::mat4 model = glm::rotate(glm::mat4(1.0f), (float)glfwGetTime(), glm::vec3(0.5f, 1.0f, 0.0f));
+    glm::mat4 model = glm::mat4(1.0f);
     glm::mat4 view = camera.GetViewMatrix();
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
 
@@ -69,7 +107,7 @@ void setShaderUniforms(Shader &shader, Camera &camera, glm::vec3 lightPos)
     shader.setVec3("objectColor", glm::vec3(0.2f, 0.6f, 1.0f));
 }
 
-int main()
+int main(int argc, char **argv)
 {
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -99,27 +137,29 @@ int main()
 
     Shader meshShader(fileio_getpath("shader/mesh.vert", 1), fileio_getpath("shader/mesh.frag", 1));
 
-    // Simple cube mesh
-    std::vector<Vertex> vertices = {
-        // positions          // normals
-        {{-0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}},
-        {{0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}},
-        {{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}},
-        {{-0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}},
-        {{-0.5f, -0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
-        {{0.5f, -0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
-        {{0.5f, 0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
-        {{-0.5f, 0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
-    };
-    std::vector<unsigned int> indices = {
-        0, 1, 2, 2, 3, 0, // back
-        4, 5, 6, 6, 7, 4, // front
-        0, 1, 5, 5, 4, 0, // bottom
-        2, 3, 7, 7, 6, 2, // top
-        0, 3, 7, 7, 4, 0, // left
-        1, 2, 6, 6, 5, 1  // right
-    };
-    Mesh cube(vertices, indices);
+    // Load PDB
+    if (argc < 2)
+    {
+        std::cerr << "Usage: " << argv[0] << " <pdb_file>\n";
+        return 1;
+    }
+
+    std::ifstream pdbFile(argv[1]);
+    if (!pdbFile)
+    {
+        std::cerr << "Error: could not open file " << argv[1] << "\n";
+        return 1;
+    }
+    pdb::Reader reader(pdbFile);
+    auto model = reader.read();
+    if (!model)
+    {
+        std::cerr << "Error: failed to read PDB file" << std::endl;
+        return 1;
+    }
+    std::cout << "Atoms: " << model->atoms.size() << " Connections: " << model->connections.size() << std::endl;
+
+    Mesh cube = modelToMesh(*model);
 
     glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 

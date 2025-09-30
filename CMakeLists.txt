@@ -27,6 +27,12 @@ set(SOURCES
     src/utils/fileio.cpp
     src/renderer/mesh.cpp
     src/renderer/camera.cpp
+    src/pdb/atom.cpp
+    src/pdb/chain.cpp
+    src/pdb/common.cpp
+    src/pdb/model.cpp
+    src/pdb/residue.cpp
+    src/pdb/secondary_structure.cpp
 )
 
 add_executable(ogt ${SOURCES})
