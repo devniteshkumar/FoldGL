@@ -37,33 +37,14 @@ Mesh modelToMesh(const pdb::Model &model)
 {
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
-    std::unordered_map<int, unsigned int> serialToIndex; // atom.serial -> vertex index
-
-    // 1. Atoms → vertices
-    for (const auto &atom : model.atoms)
-    {
+    // For each atom, create a vertex
+    for (size_t i = 0; i < model.atoms.size(); ++i) {
+        const auto &atom = model.atoms[i];
         Vertex v;
         v.Position = glm::vec3(atom->x, atom->y, atom->z);
-
-        // Normal placeholder: if drawing as points/lines, normals don't matter
-        // If later you do spheres/surfaces, you’ll want real normals
-        v.Normal = glm::normalize(v.Position);
-
-        serialToIndex[atom->serial] = static_cast<unsigned int>(vertices.size());
+        v.Normal = glm::vec3(0.0f, 0.0f, 1.0f); // Default normal
         vertices.push_back(v);
-    }
-
-    // 2. Connections → indices
-    for (const auto &conn : model.connections)
-    {
-        auto it1 = serialToIndex.find(conn->serial1);
-        auto it2 = serialToIndex.find(conn->serial2);
-
-        if (it1 != serialToIndex.end() && it2 != serialToIndex.end())
-        {
-            indices.push_back(it1->second);
-            indices.push_back(it2->second);
-        }
+        indices.push_back(static_cast<unsigned int>(i));
     }
     return Mesh(vertices, indices);
 }
@@ -161,7 +142,16 @@ int main(int argc, char **argv)
 
     Mesh cube = modelToMesh(*model);
 
-    glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+    // Compute model center
+    glm::vec3 center(0.0f);
+    if (!model->atoms.empty()) {
+        for (const auto &atom : model->atoms) {
+            center += glm::vec3(atom->x, atom->y, atom->z);
+        }
+        center /= static_cast<float>(model->atoms.size());
+    }
+
+    glm::vec3 lightPos = center + glm::vec3(1.2f, 1.0f, 2.0f);
 
     Camera camera;
     g_camera = &camera;

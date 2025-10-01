@@ -34,8 +34,8 @@ Mesh::~Mesh()
 
 void Mesh::Draw()
 {
-    glPointSize(5.0f);
     glBindVertexArray(VAO);
-    glDrawArrays(GL_POINTS, 0, vertices.size());
+    glDrawElements(GL_POINTS, indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
+    
 }
