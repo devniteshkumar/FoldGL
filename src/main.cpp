@@ -35,16 +35,84 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos)
 // Model to Mesh
 Mesh modelToMesh(const pdb::Model &model)
 {
+    // Point cloud code commented out:
+    // std::vector<Vertex> vertices;
+    // std::vector<unsigned int> indices;
+    // for (size_t i = 0; i < model.atoms.size(); ++i) {
+    //     const auto &atom = model.atoms[i];
+    //     Vertex v;
+    //     v.Position = glm::vec3(atom->x, atom->y, atom->z);
+    //     v.Normal = glm::vec3(0.0f, 0.0f, 1.0f);
+    //     vertices.push_back(v);
+    //     indices.push_back(static_cast<unsigned int>(i));
+    // }
+    // return Mesh(vertices, indices);
+
+    // Ribbon rendering with volume: create a tube mesh along CA backbone
+    std::vector<glm::vec3> ca_positions;
+    for (size_t i = 0; i < model.residues.size(); ++i) {
+        const auto &res = model.residues[i];
+        for (const auto &atom : res->atoms) {
+            if (atom->name == "CA") {
+                ca_positions.push_back(glm::vec3(atom->x, atom->y, atom->z));
+            }
+        }
+    }
+
+    // Parameters for tube
+    const int segments = 12; // circle resolution
+    const float radius = 1.0f; // tube radius
+    const float maxDistance = 4.5f;
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
-    // For each atom, create a vertex
-    for (size_t i = 0; i < model.atoms.size(); ++i) {
-        const auto &atom = model.atoms[i];
-        Vertex v;
-        v.Position = glm::vec3(atom->x, atom->y, atom->z);
-        v.Normal = glm::vec3(0.0f, 0.0f, 1.0f); // Default normal
-        vertices.push_back(v);
-        indices.push_back(static_cast<unsigned int>(i));
+
+    // Generate tube vertices
+    for (size_t i = 0; i < ca_positions.size(); ++i) {
+        glm::vec3 p = ca_positions[i];
+        // Find direction
+        glm::vec3 dir;
+        if (i == 0)
+            dir = glm::normalize(ca_positions[i+1] - p);
+        else if (i == ca_positions.size()-1)
+            dir = glm::normalize(p - ca_positions[i-1]);
+        else
+            dir = glm::normalize(ca_positions[i+1] - ca_positions[i-1]);
+
+        // Find orthogonal vectors
+        glm::vec3 up = glm::vec3(0,1,0);
+        if (fabs(glm::dot(dir, up)) > 0.99f) up = glm::vec3(1,0,0);
+        glm::vec3 right = glm::normalize(glm::cross(dir, up));
+        glm::vec3 normal = glm::normalize(glm::cross(right, dir));
+
+        // Circle vertices
+        for (int j = 0; j < segments; ++j) {
+            float theta = 2.0f * 3.1415926f * float(j) / float(segments);
+            glm::vec3 circ = (right * static_cast<float>(cos(theta)) * radius) + (normal * static_cast<float>(sin(theta)) * radius);
+            Vertex v;
+            v.Position = p + circ;
+            v.Normal = glm::normalize(circ);
+            vertices.push_back(v);
+        }
+    }
+
+    // Generate tube indices (triangle strip between circles)
+    for (size_t i = 1; i < ca_positions.size(); ++i) {
+        float dist = glm::distance(ca_positions[i], ca_positions[i-1]);
+        if (dist > maxDistance) continue; // break tube if too far
+        for (int j = 0; j < segments; ++j) {
+            int curr = (i-1)*segments + j;
+            int next = i*segments + j;
+            int curr_next = (i-1)*segments + (j+1)%segments;
+            int next_next = i*segments + (j+1)%segments;
+            // Two triangles per quad
+            indices.push_back(curr);
+            indices.push_back(next);
+            indices.push_back(curr_next);
+
+            indices.push_back(curr_next);
+            indices.push_back(next);
+            indices.push_back(next_next);
+        }
     }
     return Mesh(vertices, indices);
 }
