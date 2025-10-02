@@ -23,6 +23,6 @@ private:
     glm::vec3 WorldUp;
     float Yaw;
     float Pitch;
-    float MovementSpeed = 2.5f;
+    float MovementSpeed = 50.0f;
     float MouseSensitivity = 0.1f;
 };
