@@ -25,33 +25,17 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos)
         firstMouse = false;
     }
     float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos; // reversed: y ranges bottom to top
+    float yoffset = lastY - ypos;
     lastX = xpos;
     lastY = ypos;
     if (g_camera)
         g_camera->ProcessMouseMovement(xoffset, yoffset);
 }
 
-// Model to Mesh
-Mesh modelToMesh(const pdb::Model &model)
+// Helper functions for model to mesh conversion
+std::vector<glm::vec3> getCAPositions(const pdb::Model &model)
 {
-    // Point cloud code commented out:
-    // std::vector<Vertex> vertices;
-    // std::vector<unsigned int> indices;
-    // for (size_t i = 0; i < model.atoms.size(); ++i) {
-    //     const auto &atom = model.atoms[i];
-    //     Vertex v;
-    //     v.Position = glm::vec3(atom->x, atom->y, atom->z);
-    //     v.Normal = glm::vec3(0.0f, 0.0f, 1.0f);
-    //     vertices.push_back(v);
-    //     indices.push_back(static_cast<unsigned int>(i));
-    // }
-    // return Mesh(vertices, indices);
-
-    // Ribbon rendering with volume: create a tube mesh along CA backbone
     std::vector<glm::vec3> ca_positions;
-
-    // Iterate over chains
     for (const auto &chain : model.chains)
     {
         for (const auto &res : chain->residues)
@@ -65,15 +49,12 @@ Mesh modelToMesh(const pdb::Model &model)
             }
         }
     }
+    return ca_positions;
+}
 
-    // Parameters for tube
-    const int segments = 12;
-    const float radius = 1.0f;
-    const float maxDistance = 4.5f;
+std::vector<Vertex> generateTubeVertices(const std::vector<glm::vec3> &ca_positions, int segments, float radius, float maxDistance)
+{
     std::vector<Vertex> vertices;
-    std::vector<unsigned int> indices;
-
-    // Generate tube vertices
     for (size_t i = 0; i < ca_positions.size(); ++i)
     {
         glm::vec3 p = ca_positions[i];
@@ -101,8 +82,12 @@ Mesh modelToMesh(const pdb::Model &model)
             vertices.push_back(v);
         }
     }
+    return vertices;
+}
 
-    // Generate tube indices
+std::vector<unsigned int> generateTubeIndices(const std::vector<glm::vec3> &ca_positions, int segments, float maxDistance)
+{
+    std::vector<unsigned int> indices;
     for (size_t i = 1; i < ca_positions.size(); ++i)
     {
         float dist = glm::distance(ca_positions[i], ca_positions[i - 1]);
@@ -124,10 +109,17 @@ Mesh modelToMesh(const pdb::Model &model)
             indices.push_back(next_next);
         }
     }
+    return indices;
+}
+
+Mesh modelToMesh(const pdb::Model &model)
+{
+    std::vector<glm::vec3> ca_positions = getCAPositions(model);
+    std::vector<Vertex> vertices = generateTubeVertices(ca_positions, 12, 1.0f, 4.5f);
+    std::vector<unsigned int> indices = generateTubeIndices(ca_positions, 12, 4.5f);
 
     return Mesh(vertices, indices);
 }
-
 void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 {
     glViewport(0, 0, width, height);
@@ -173,8 +165,8 @@ int main(int argc, char **argv)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-    GLFWwindow *window = glfwCreateWindow(800, 600, "3D Mesh Renderer", NULL, NULL);
+    const GLFWvidmode *mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+    GLFWwindow *window = glfwCreateWindow(mode->width, mode->height, "3D Mesh Renderer", glfwGetPrimaryMonitor(), NULL);
     if (!window)
     {
         std::cerr << "Failed to create GLFW window" << std::endl;
