@@ -35,7 +35,7 @@ Mesh::~Mesh()
 void Mesh::Draw()
 {
     glBindVertexArray(VAO);
-    glDrawElements(GL_LINE_STRIP, indices.size(), GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
     
 }

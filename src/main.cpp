@@ -85,14 +85,19 @@ std::vector<Vertex> generateTubeVertices(const std::vector<glm::vec3> &ca_positi
     return vertices;
 }
 
-std::vector<unsigned int> generateTubeIndices(const std::vector<glm::vec3> &ca_positions, int segments, float maxDistance)
+std::vector<std::vector<unsigned int>> generateTubeIndices(const std::vector<glm::vec3> &ca_positions, int segments, float maxDistance)
 {
-    std::vector<unsigned int> indices;
+    std::vector<std::vector<unsigned int>> indices(1);
+    int k = 0;
     for (size_t i = 1; i < ca_positions.size(); ++i)
     {
         float dist = glm::distance(ca_positions[i], ca_positions[i - 1]);
         if (dist > maxDistance)
+        {
+            indices.push_back(std::vector<unsigned int>());
+            k++;
             continue;
+        }
         for (int j = 0; j < segments; ++j)
         {
             int curr = (i - 1) * segments + j;
@@ -100,26 +105,35 @@ std::vector<unsigned int> generateTubeIndices(const std::vector<glm::vec3> &ca_p
             int curr_next = (i - 1) * segments + (j + 1) % segments;
             int next_next = i * segments + (j + 1) % segments;
 
-            indices.push_back(curr);
-            indices.push_back(next);
-            indices.push_back(curr_next);
+            indices[k].push_back(curr);
+            indices[k].push_back(next);
+            indices[k].push_back(curr_next);
 
-            indices.push_back(curr_next);
-            indices.push_back(next);
-            indices.push_back(next_next);
+            indices[k].push_back(curr_next);
+            indices[k].push_back(next);
+            indices[k].push_back(next_next);
         }
     }
     return indices;
 }
 
-Mesh modelToMesh(const pdb::Model &model)
+std::vector<Mesh> modelToMesh(const pdb::Model &model)
 {
     std::vector<glm::vec3> ca_positions = getCAPositions(model);
     std::vector<Vertex> vertices = generateTubeVertices(ca_positions, 12, 1.0f, 4.5f);
-    std::vector<unsigned int> indices = generateTubeIndices(ca_positions, 12, 4.5f);
+    std::vector<std::vector<unsigned int>> indices = generateTubeIndices(ca_positions, 12, 4.5f);
 
-    return Mesh(vertices, indices);
+    std::vector<Mesh> meshes;
+    meshes.reserve(indices.size());
+    for (size_t i = 0; i < indices.size(); ++i)
+    {
+        if (indices[i].empty()) continue;          // skip empty groups
+        meshes.emplace_back(vertices, indices[i]); // construct in-place (no extra copy)
+    }
+
+    return meshes;
 }
+
 void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 {
     glViewport(0, 0, width, height);
@@ -211,7 +225,7 @@ int main(int argc, char **argv)
     }
     std::cout << "Atoms: " << model->atoms.size() << " Connections: " << model->connections.size() << std::endl;
 
-    Mesh cube = modelToMesh(*model);
+    std::vector<Mesh> cube = modelToMesh(*model);
 
     // Compute model center
     glm::vec3 center(0.0f);
@@ -245,7 +259,11 @@ int main(int argc, char **argv)
         meshShader.autoreload();
         meshShader.use();
         setShaderUniforms(meshShader, camera, lightPos);
-        cube.Draw();
+
+        for (auto &mesh : cube)
+        {
+            mesh.Draw();
+        }
 
         glfwSwapBuffers(window);
         glfwPollEvents();

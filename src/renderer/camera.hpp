@@ -12,6 +12,7 @@ public:
     void ProcessKeyboard(char direction, float deltaTime);
     void ProcessMouseMovement(float xoffset, float yoffset, bool constrainPitch = true);
     glm::vec3 GetPosition() const { return Position; }
+    void SetPosition(glm::vec3 position) { Position = position; }
 
 private:
     void updateCameraVectors();
