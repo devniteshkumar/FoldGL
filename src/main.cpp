@@ -127,7 +127,8 @@ std::vector<Mesh> modelToMesh(const pdb::Model &model)
     meshes.reserve(indices.size());
     for (size_t i = 0; i < indices.size(); ++i)
     {
-        if (indices[i].empty()) continue;          // skip empty groups
+        if (indices[i].empty())
+            continue;                              // skip empty groups
         meshes.emplace_back(vertices, indices[i]); // construct in-place (no extra copy)
     }
 
@@ -170,7 +171,7 @@ void setShaderUniforms(Shader &shader, Camera &camera, glm::vec3 lightPos)
     shader.setVec3("lightPos", lightPos);
     shader.setVec3("viewPos", camera.GetPosition());
     shader.setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-    shader.setVec3("objectColor", glm::vec3(0.2f, 0.6f, 1.0f));
+    // shader.setVec3("objectColor", glm::vec3(0.2f, 0.6f, 1.0f));
 }
 
 int main(int argc, char **argv)
@@ -227,6 +228,30 @@ int main(int argc, char **argv)
 
     std::vector<Mesh> cube = modelToMesh(*model);
 
+    // Assign a distinct color to each mesh
+    std::vector<glm::vec3> meshColors;
+    meshColors.reserve(cube.size());
+    for (size_t i = 0; i < cube.size(); ++i)
+    {
+        float hue = static_cast<float>(i) / cube.size(); // 0 → 1 across all meshes
+
+        // Convert hue → RGB with smoother, warmer tones
+        float r = 0.5f + 0.5f * sinf(6.283f * (hue + 0.0f));
+        float g = 0.5f + 0.5f * sinf(6.283f * (hue + 0.33f));
+        float b = 0.5f + 0.5f * sinf(6.283f * (hue + 0.67f));
+
+        // Apply slight gamma correction for depth
+        r = powf(r, 1.2f);
+        g = powf(g, 1.2f);
+        b = powf(b, 1.2f);
+
+        // Desaturate slightly to avoid overly bright colors
+        glm::vec3 color(r, g, b);
+        color = glm::mix(color, glm::vec3(0.7f), 0.15f);
+
+        meshColors.push_back(color);
+    }
+
     // Compute model center
     glm::vec3 center(0.0f);
     if (!model->atoms.empty())
@@ -260,9 +285,10 @@ int main(int argc, char **argv)
         meshShader.use();
         setShaderUniforms(meshShader, camera, lightPos);
 
-        for (auto &mesh : cube)
+        for (size_t i = 0; i < cube.size(); ++i)
         {
-            mesh.Draw();
+            meshShader.setVec3("objectColor", meshColors[i]);
+            cube[i].Draw();
         }
 
         glfwSwapBuffers(window);

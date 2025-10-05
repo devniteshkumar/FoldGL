@@ -13,6 +13,8 @@ public:
     void ProcessMouseMovement(float xoffset, float yoffset, bool constrainPitch = true);
     glm::vec3 GetPosition() const { return Position; }
     void SetPosition(glm::vec3 position) { Position = position; }
+    glm::vec3 GetFront() const { return Front; }
+    void SetFront(glm::vec3 front) { Front = front; }
 
 private:
     void updateCameraVectors();
