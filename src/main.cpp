@@ -168,7 +168,8 @@ void setShaderUniforms(Shader &shader, Camera &camera, glm::vec3 lightPos)
     shader.setMat4("model", model);
     shader.setMat4("view", view);
     shader.setMat4("projection", projection);
-    shader.setVec3("lightPos", lightPos);
+    // Set lightPos to camera position
+    shader.setVec3("lightPos", camera.GetPosition());
     shader.setVec3("viewPos", camera.GetPosition());
     shader.setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
     // shader.setVec3("objectColor", glm::vec3(0.2f, 0.6f, 1.0f));
