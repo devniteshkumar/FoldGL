@@ -46,23 +46,24 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-FoldGL is a high-performance 3D protein structure visualization tool built with modern OpenGL. It provides comprehensive support for parsing and rendering Protein Data Bank (PDB) files with an intuitive camera system for interactive exploration of molecular structures.
+FoldGL is a high-performance 3D protein structure visualization tool built with modern OpenGL. It provides real-time rendering of Protein Data Bank (PDB) files with smooth tube-based visualization and an intuitive camera system for interactive exploration of molecular structures.
 
-**Key Features:**
-- **PDB File Parsing**: Complete support for standard PDB format files
-  - Atomic coordinates and properties
-  - Residue and chain information
-  - Secondary structure elements (helices, strands, coils)
-  - Multiple model support
-- **3D Visualization**: Real-time OpenGL rendering
+**Current Features:**
+- **PDB File Loading**: Functional support for standard PDB format files
+  - Command-line PDB file input
+  - Atomic coordinate parsing
+  - Residue and chain information extraction
+  - CA (Carbon Alpha) backbone extraction
+- **3D Tube Visualization**: Real-time OpenGL rendering
   - Modern shader-based rendering pipeline
-  - Smooth camera controls with mouse and keyboard
-  - 3D mesh rendering with proper lighting
-- **Molecular Structure Support**:
-  - Atom-level visualization
-  - Residue-based organization
-  - Chain and model hierarchy
-  - Secondary structure representation
+  - Smooth tube rendering along protein backbone
+  - Multi-colored chain segments for visual distinction
+  - Advanced lighting system with proper shading
+- **Interactive Navigation**:
+  - Smooth first-person camera controls
+  - Mouse look and WASD movement
+  - Fullscreen rendering mode
+  - Real-time camera-based lighting
 - **Development Features**:
   - Hot-reload shader support for real-time development
   - Memory-safe implementation with Address Sanitizer support
@@ -112,10 +113,12 @@ _Now that the environment has been set up and configured to properly compile and
    ```sh
    cmake --build .
    ```
-6. Run the application
+6. Run the application with a PDB file
    ```sh
-   ./build/ogt
+   ./build/ogt path/to/your/protein.pdb
    ```
+
+**Note:** The application requires a PDB file as a command-line argument to run. You can download sample PDB files from the [Protein Data Bank](https://www.rcsb.org/).
 
 **Alternative:** If you are using VSCode, you can use the CMake extension and run the build task (generally, `Ctrl + Shift + B`).
 
@@ -125,7 +128,7 @@ _Now that the environment has been set up and configured to properly compile and
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-FoldGL provides an interactive 3D environment for visualizing protein structures from PDB files. Use the intuitive camera controls to explore molecular structures in real-time with smooth navigation and lighting.
+FoldGL provides real-time 3D visualization of protein structures from PDB files with smooth tube-based rendering. The application loads PDB files via command-line arguments and renders them as colorful tube structures representing the protein backbone.
 
 **Camera Controls:**
 - **W/A/S/D**: Move camera forward/left/backward/right
@@ -134,10 +137,20 @@ FoldGL provides an interactive 3D environment for visualizing protein structures
 - **ESC**: Exit application
 
 **Getting Started:**
-1. Launch the application using `./build/ogt`
-2. The application will start with a simple 3D scene
-3. Use the camera controls to navigate around the 3D space
-4. *Note: PDB file loading functionality is currently in development*
+1. Build the application (see Installation section below)
+2. Launch with a PDB file: `./build/ogt path/to/your/protein.pdb`
+3. The application will load the protein structure and display it as colored tubes
+4. Use the camera controls to navigate around the 3D protein structure
+5. Each chain segment is rendered with distinct colors for easy identification
+
+**Example Usage:**
+```bash
+# Download a sample PDB file (e.g., 1BNA - a DNA structure)
+wget https://files.rcsb.org/download/1BNA.pdb
+
+# Run FoldGL with the PDB file
+./build/ogt 1BNA.pdb
+```
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -145,7 +158,7 @@ FoldGL provides an interactive 3D environment for visualizing protein structures
 
 ```
 .
-├── build/                      # Build output directory
+├── build/                      # Build output directory (generated)
 │   └── ogt                     # Compiled executable
 ├── external/                   # External dependencies (git submodules)
 │   ├── glad/                   # OpenGL loader library
@@ -182,24 +195,33 @@ FoldGL provides an interactive 3D environment for visualizing protein structures
 
 ## TODO
 
-### Core Features
-- [ ] **PDB File Loading and Integration**
-  - [ ] Command-line argument support for PDB file input
+### Completed Features ✅
+- [x] **PDB File Loading and Integration**
+  - [x] Command-line argument support for PDB file input
+  - [x] Integration of PDB parser with rendering system
+  - [x] Error handling for malformed PDB files
+  - [x] CA (Carbon Alpha) backbone extraction
   - [ ] File dialog for interactive PDB file selection
-  - [ ] Integration of PDB parser with rendering system
-  - [ ] Error handling for malformed PDB files
   - [ ] Support for compressed PDB files (.pdb.gz)
 
-- [ ] **Protein Visualization**
+- [x] **Basic Protein Visualization**
+  - [x] Tube-based backbone rendering
+  - [x] Multi-colored chain segments
+  - [x] Advanced lighting system with proper shading
+  - [x] Real-time camera-based lighting
+  - [x] Smooth tube geometry generation
+
+### Core Features (In Progress)
+- [ ] **Enhanced Protein Visualization**
   - [ ] Atom-based rendering (spheres/points)
   - [ ] Bond visualization (cylinders/lines)
   - [ ] Multiple representation modes:
     - [ ] Ball-and-stick model
     - [ ] Space-filling model
-    - [ ] Ribbon/cartoon representation
+    - [x] Basic ribbon/cartoon representation (tube-based)
     - [ ] Wireframe model
   - [ ] Secondary structure highlighting
-    - [ ] Alpha helices (cylinders/ribbons)
+    - [ ] Alpha helices (enhanced cylinders/ribbons)
     - [ ] Beta strands (arrows/sheets)
     - [ ] Loops and coils
 
