@@ -41,6 +41,7 @@ target_include_directories(ogt PRIVATE
     external/glad/include
     external/glfw/include
     external/glm
+    external/bullet
     external
     src/utils
     src
@@ -49,4 +50,23 @@ target_include_directories(ogt PRIVATE
 target_link_libraries(ogt
     OpenGL::GL
     glfw
+    BulletDynamics
+    BulletCollision
+    LinearMath
 )
+
+# --- Bullet: disable extras ---
+set(BUILD_BULLET2_DEMOS OFF CACHE BOOL "" FORCE)
+set(BUILD_BULLET3 OFF CACHE BOOL "" FORCE)
+set(BUILD_CPU_DEMOS OFF CACHE BOOL "" FORCE)
+set(BUILD_EXTRAS OFF CACHE BOOL "" FORCE)
+set(BUILD_OPENGL3_DEMOS OFF CACHE BOOL "" FORCE)
+set(BUILD_UNIT_TESTS OFF CACHE BOOL "" FORCE)
+set(BUILD_ENET OFF CACHE BOOL "" FORCE)
+set(BUILD_CLSOCKET OFF CACHE BOOL "" FORCE)
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+set(INSTALL_LIBS OFF CACHE BOOL "" FORCE)
+
+
+# Add Bullet physics engine
+add_subdirectory(external/bullet)
