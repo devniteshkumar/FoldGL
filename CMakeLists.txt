@@ -33,6 +33,7 @@ set(SOURCES
     src/pdb/model.cpp
     src/pdb/residue.cpp
     src/pdb/secondary_structure.cpp
+    src/physics/unfold.cpp
 )
 
 add_executable(ogt ${SOURCES})
@@ -41,7 +42,7 @@ target_include_directories(ogt PRIVATE
     external/glad/include
     external/glfw/include
     external/glm
-    external/bullet
+    external/bullet/src
     external
     src/utils
     src

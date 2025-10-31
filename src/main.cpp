@@ -10,6 +10,7 @@
 #include <vector>
 #include <iostream>
 #include "utils/fileio.hpp"
+#include "physics/unfold.hpp"
 
 // Mouse state
 float lastX = 400.0f;
@@ -227,6 +228,10 @@ int main(int argc, char **argv)
     }
     std::cout << "Atoms: " << model->atoms.size() << " Connections: " << model->connections.size() << std::endl;
 
+    // Build unfolding simulation on CA trace
+    UnfoldSim sim(*model);
+
+    // Initial mesh from CA positions
     std::vector<Mesh> cube = modelToMesh(*model);
 
     // Assign a distinct color to each mesh
@@ -278,6 +283,15 @@ int main(int argc, char **argv)
         lastFrame = currentFrame;
 
         processInput(window, camera, deltaTime);
+
+        // Physics: pull ends a bit to drive unfolding and step
+        sim.applyPulling(100.0f);
+        sim.step(deltaTime);
+
+        // Update mesh vertices from current CA positions
+        std::vector<glm::vec3> ca_positions = sim.getCAPositions();
+        std::vector<Vertex> vertices = generateTubeVertices(ca_positions, 12, 1.0f, 4.5f);
+        for (auto& m : cube) m.UpdateVertices(vertices);
 
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

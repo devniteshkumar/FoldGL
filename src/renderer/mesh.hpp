@@ -16,4 +16,5 @@ public:
     Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices);
     ~Mesh();
     void Draw();
+    void UpdateVertices(const std::vector<Vertex>& newVertices);
 };
