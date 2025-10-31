@@ -141,6 +141,10 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height)
     glViewport(0, 0, width, height);
 }
 
+// Unfolding control flag
+bool unfoldingActive = false;
+bool unfoldKeyPrev = false;
+
 void processInput(GLFWwindow *window, Camera &camera, float deltaTime)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -157,6 +161,13 @@ void processInput(GLFWwindow *window, Camera &camera, float deltaTime)
         camera.ProcessKeyboard('Q', deltaTime);
     if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
         camera.ProcessKeyboard('E', deltaTime);
+
+    // Toggle unfolding on 'U' key press (not hold)
+    bool unfoldKey = glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS;
+    if (unfoldKey && !unfoldKeyPrev) {
+        unfoldingActive = !unfoldingActive;
+    }
+    unfoldKeyPrev = unfoldKey;
 }
 
 void setShaderUniforms(Shader &shader, Camera &camera, glm::vec3 lightPos)
@@ -284,9 +295,12 @@ int main(int argc, char **argv)
 
         processInput(window, camera, deltaTime);
 
-        // Physics: pull ends a bit to drive unfolding and step
-        sim.applyPulling(100.0f);
-        sim.step(deltaTime);
+
+        // Physics: only unfold if active
+        if (unfoldingActive) {
+            sim.applyPulling(1000.0f);
+            sim.step(deltaTime);
+        }
 
         // Update mesh vertices from current CA positions
         std::vector<glm::vec3> ca_positions = sim.getCAPositions();
