@@ -74,6 +74,7 @@ This project uses the following external libraries as git submodules:
 - **GLAD** - OpenGL loader library for modern OpenGL functions
 - **GLFW** - Cross-platform window and input handling
 - **GLM** - OpenGL Mathematics library for vector/matrix operations
+- **Bullet Physics** - Rigid-body engine powering bond-constrained unfolding (included as submodule)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -152,6 +153,13 @@ wget https://files.rcsb.org/download/1BNA.pdb
 ./build/ogt 1BNA.pdb
 ```
 
+### Unfolding Simulation (Bullet)
+- The CA backbone is simulated with rigid bodies connected by constraints that lock bond lengths and angles; only torsion is free.
+- Unfolding runs automatically by applying a gentle end-to-end pull each frame.
+- Tuning:
+  - Pull strength: edit `sim.applyPulling(...)` in `src/main.cpp`.
+  - Mass/damping and CA sphere radius: see `src/physics/unfold.cpp`.
+
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 ## Project Structure
@@ -163,6 +171,7 @@ wget https://files.rcsb.org/download/1BNA.pdb
 ├── external/                   # External dependencies (git submodules)
 │   ├── glad/                   # OpenGL loader library
 │   ├── glfw/                   # Window and input handling
+│   ├── bullet/                 # Bullet Physics engine
 │   └── glm/                    # OpenGL Mathematics library
 ├── CMakeLists.txt              # CMake build configuration
 └── src/                        # Source code
@@ -185,6 +194,8 @@ wget https://files.rcsb.org/download/1BNA.pdb
     ├── shader/                 # GLSL shader files
     │   ├── mesh.vert           # Vertex shader for 3D meshes
     │   └── mesh.frag           # Fragment shader for lighting
+    ├── physics/               # Bullet-based unfolding simulation
+    │   └── unfold.hpp/cpp
     └── utils/                  # Utility functions
         ├── fileio.hpp/cpp      # File I/O operations
         ├── FileWatch.hpp       # Hot-reload file watching
@@ -193,131 +204,23 @@ wget https://files.rcsb.org/download/1BNA.pdb
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
-## TODO
+## Completed Features 
+* **PDB File Loading and Integration**
+  * Command-line argument support for PDB file input
+  * Integration of PDB parser with rendering system
+  * Error handling for malformed PDB files
+  * CA (Carbon Alpha) backbone extraction
 
-### Completed Features ✅
-- [x] **PDB File Loading and Integration**
-  - [x] Command-line argument support for PDB file input
-  - [x] Integration of PDB parser with rendering system
-  - [x] Error handling for malformed PDB files
-  - [x] CA (Carbon Alpha) backbone extraction
-  - [ ] File dialog for interactive PDB file selection
-  - [ ] Support for compressed PDB files (.pdb.gz)
+* **Basic Protein Visualization**
+  * Tube-based backbone rendering
+  * Multi-colored chain segments
+  * Advanced lighting system with proper shading
+* Real-time camera-based lighting
+* Smooth tube geometry generation
 
-- [x] **Basic Protein Visualization**
-  - [x] Tube-based backbone rendering
-  - [x] Multi-colored chain segments
-  - [x] Advanced lighting system with proper shading
-  - [x] Real-time camera-based lighting
-  - [x] Smooth tube geometry generation
-
-### Core Features (In Progress)
-- [ ] **Enhanced Protein Visualization**
-  - [ ] Atom-based rendering (spheres/points)
-  - [ ] Bond visualization (cylinders/lines)
-  - [ ] Multiple representation modes:
-    - [ ] Ball-and-stick model
-    - [ ] Space-filling model
-    - [x] Basic ribbon/cartoon representation (tube-based)
-    - [ ] Wireframe model
-  - [ ] Secondary structure highlighting
-    - [ ] Alpha helices (enhanced cylinders/ribbons)
-    - [ ] Beta strands (arrows/sheets)
-    - [ ] Loops and coils
-
-- [ ] **Interactive Features**
-  - [ ] Atom/residue selection and highlighting
-  - [ ] Information display for selected atoms/residues
-  - [ ] Distance and angle measurements
-  - [ ] Multiple protein loading and comparison
-  - [ ] Animation support for multi-model PDB files
-
-### User Interface
-- [ ] **GUI Development**
-  - [ ] Integrate ImGui for control panels
-  - [ ] File browser widget
-  - [ ] Visualization controls:
-    - [ ] Representation mode selection
-    - [ ] Color scheme options
-    - [ ] Visibility toggles for chains/residues
-    - [ ] Lighting and material properties
-  - [ ] Information panels:
-    - [ ] Protein metadata display
-    - [ ] Selection details
-    - [ ] Statistics and analysis
-
-- [ ] **Camera and Navigation**
-  - [ ] Improved camera system:
-    - [ ] Orbit/trackball navigation
-    - [ ] Zoom to selection
-    - [ ] Predefined viewpoints
-    - [ ] Smooth camera transitions
-  - [ ] View presets (front, back, top, etc.)
-  - [ ] Camera position saving/loading
-
-### Performance and Optimization
-- [ ] **Rendering Optimization**
-  - [ ] Level-of-detail (LOD) system for large proteins
-  - [ ] Instanced rendering for repeated elements
-  - [ ] Frustum culling for off-screen atoms
-  - [ ] GPU-based atom/bond generation
-  - [ ] Texture-based color schemes
-
-- [ ] **Memory Management**
-  - [ ] Efficient data structures for large proteins
-  - [ ] Streaming for extremely large datasets
-  - [ ] Memory pool allocation
-  - [ ] Garbage collection for unused resources
-
-### Advanced Features
-- [ ] **Analysis Tools**
-  - [ ] Ramachandran plot visualization
-  - [ ] Hydrogen bond detection and display
-  - [ ] Surface area calculations
-  - [ ] Cavity and pocket detection
-  - [ ] Molecular dynamics trajectory support
-
-- [ ] **Export and Sharing**
-  - [ ] High-resolution image export
-  - [ ] 3D model export (OBJ, STL)
-  - [ ] Animation export (video/GIF)
-  - [ ] Session save/load functionality
-  - [ ] Web-based sharing capabilities
-
-### Technical Improvements
-- [ ] **Code Quality**
-  - [ ] Comprehensive unit testing
-  - [ ] Automated integration tests
-  - [ ] Performance benchmarking
-  - [ ] Memory leak detection
-  - [ ] Code documentation with Doxygen
-
-- [ ] **Platform Support**
-  - [ ] Linux support optimization
-  - [ ] Windows compatibility
-  - [ ] macOS support
-  - [ ] Web Assembly port (experimental)
-
-- [ ] **Developer Experience**
-  - [ ] Plugin system architecture
-  - [ ] Python scripting interface
-  - [ ] Automated build system (CI/CD)
-  - [ ] Development documentation
-  - [ ] Contributing guidelines
-
-### Research and Education Features
-- [ ] **Educational Tools**
-  - [ ] Interactive tutorials
-  - [ ] Guided protein exploration
-  - [ ] Annotation system for teaching
-  - [ ] Quiz/assessment integration
-
-- [ ] **Research Integration**
-  - [ ] PDB database API integration
-  - [ ] UniProt data integration
-  - [ ] RCSB PDB metadata display
-  - [ ] Literature reference linking
-  - [ ] Experimental data visualization
+* **Physics-based Unfolding**
+  * Bond-length and bond-angle preservation (twist-only) via Bullet constraints
+  * Real-time mesh updates from physics
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
