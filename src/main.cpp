@@ -282,9 +282,31 @@ int main(int argc, char **argv)
 
     glm::vec3 lightPos = center + glm::vec3(1.2f, 1.0f, 2.0f);
 
-    Camera camera;
+
+    // Camera: start at a distance that fits the model
+    float modelRadius = 50.0f;
+    if (!model->atoms.empty()) {
+        float maxDist = 0.0f;
+        for (const auto &atom : model->atoms) {
+            float d = glm::distance(center, glm::vec3(atom->x, atom->y, atom->z));
+            if (d > maxDist) maxDist = d;
+        }
+        modelRadius = maxDist;
+    }
+    Camera camera(center + glm::vec3(0, 0, modelRadius * 2.2f));
+    camera.SetFront(glm::normalize(center - camera.GetPosition()));
     g_camera = &camera;
     glfwSetCursorPosCallback(window, mouse_callback);
+
+    // Add scroll-to-zoom
+    auto scroll_callback = [](GLFWwindow *window, double xoffset, double yoffset) {
+        if (g_camera) {
+            glm::vec3 dir = g_camera->GetFront();
+            g_camera->SetPosition(g_camera->GetPosition() + dir * (float)yoffset * 5.0f);
+        }
+    };
+    glfwSetScrollCallback(window, scroll_callback);
+
     float lastFrame = 0.0f;
 
     while (!glfwWindowShouldClose(window))
@@ -307,8 +329,10 @@ int main(int argc, char **argv)
         std::vector<Vertex> vertices = generateTubeVertices(ca_positions, 12, 1.0f, 4.5f);
         for (auto& m : cube) m.UpdateVertices(vertices);
 
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // Modern dark blue background
+    glClearColor(0.07f, 0.10f, 0.18f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         meshShader.autoreload();
         meshShader.use();
